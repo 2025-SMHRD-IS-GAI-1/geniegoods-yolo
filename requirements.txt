@@ -1,0 +1,11 @@
+# Pillow 충돌 방지 (핵심)
+pillow==10.2.0
+
+# 나머지 패키지
+ultralytics
+opencv-python
+numpy
+fastapi
+uvicorn[standard]
+python-multipart
+pydantic
