@@ -44,7 +44,7 @@ Thumbs.db
 # ===============================
 runs/              # YOLO detect/train 결과
 *.pt               # YOLO model weights
-
+yolo11m-seg.pt
 # ===============================
 # Uploaded / Generated Files
 # ===============================
@@ -65,4 +65,4 @@ outputs/
 # ===============================
 .cache/
 dist/
-build/
+build/*.pt
