@@ -147,6 +147,23 @@ async def detect_objects_multiple(
                 label = names.get(cls_id, f"class{cls_id}")
                 
                 x1, y1, x2, y2 = map(int, b.xyxy[0])
+                # ---- 작은 바운딩 박스 제거(면적 비율 기준) ----
+                h, w = img.shape[:2]
+                bw = max(0, x2 - x1)
+                bh = max(0, y2 - y1)
+                box_area = bw * bh
+                img_area = w * h
+
+                MIN_BOX_AREA_RATIO = 0.03  # 3% 미만 박스 제거 (2~5%에서 튜닝)
+
+                if img_area > 0 and (box_area / img_area) < MIN_BOX_AREA_RATIO:
+                    continue
+                # ---------------------------------------------
+
+                # 패딩 적용하여 크롭
+                crop, (nx1, ny1, nx2, ny2) = crop_with_padding(
+                    img, x1, y1, x2, y2, pad=PAD, max_pad_px=MAX_PAD_PX
+                )
                 
                 # 패딩 적용하여 크롭
                 crop, (nx1, ny1, nx2, ny2) = crop_with_padding(
