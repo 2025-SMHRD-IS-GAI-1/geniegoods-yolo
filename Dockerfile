@@ -9,6 +9,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     g++ \
     && rm -rf /var/lib/apt/lists/*
 
+# pip 업그레이드 및 빌드 도구 설치 (시스템 레벨)
+RUN pip install --upgrade pip && \
+    pip install setuptools wheel build
+
 # Python 패키지 설치 (사용자 디렉토리에 설치)
 COPY requirements.txt .
 RUN pip install --user --no-cache-dir -r requirements.txt
