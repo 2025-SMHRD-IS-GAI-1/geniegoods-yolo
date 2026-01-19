@@ -4,12 +4,17 @@ WORKDIR /app
 
 # 시스템 패키지 설치 (OpenCV, YOLO에 필요)
 RUN apt-get update && apt-get install -y \
-    libgl1-mesa-glx \
+    libgl1 \
     libglib2.0-0 \
     libsm6 \
     libxext6 \
     libxrender-dev \
     libgomp1 \
+    mesa-utils \
+    apt-transport-https \
+    ca-certificates \
+    wget \
+    gnupg \
     && rm -rf /var/lib/apt/lists/*
 
 # Python 의존성 설치
