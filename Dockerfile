@@ -1,31 +1,42 @@
+# 빌드 스테이지
+FROM python:3.12-slim as builder
+
+WORKDIR /app
+
+# 빌드에 필요한 최소한의 도구만 설치
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc \
+    g++ \
+    && rm -rf /var/lib/apt/lists/*
+
+# Python 패키지 설치 (사용자 디렉토리에 설치)
+COPY requirements.txt .
+RUN pip install --user --no-cache-dir -r requirements.txt
+
+# 실행 스테이지
 FROM python:3.12-slim
 
 WORKDIR /app
 
-# 시스템 패키지 설치 (OpenCV, YOLO에 필요)
-RUN apt-get update && apt-get install -y \
+# 런타임에 필요한 최소한의 시스템 패키지만 설치
+RUN apt-get update && apt-get install -y --no-install-recommends \
     libgl1 \
     libglib2.0-0 \
     libsm6 \
     libxext6 \
     libxrender-dev \
     libgomp1 \
-    mesa-utils \
-    apt-transport-https \
-    ca-certificates \
-    wget \
-    gnupg \
+    && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Python 의존성 설치
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-# YOLO 모델 다운로드 (첫 실행 시 자동 다운로드되지만 미리 다운로드 가능)
-# RUN python -c "from ultralytics import YOLO; YOLO('yolo11m-seg.pt')"
+# 빌드 스테이지에서 Python 패키지 복사
+COPY --from=builder /root/.local /root/.local
 
 # 애플리케이션 코드 복사
 COPY main.py .
+
+# PATH에 로컬 패키지 추가
+ENV PATH=/root/.local/bin:$PATH
 
 # 포트 노출
 EXPOSE 8000
