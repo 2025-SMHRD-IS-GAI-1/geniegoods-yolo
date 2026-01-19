@@ -1,48 +1,30 @@
-# 빌드 스테이지
+# 1단계: 빌드용
 FROM python:3.12-slim AS builder
-
 WORKDIR /app
 
-# 빌드에 필요한 최소한의 도구만 설치
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    gcc \
-    g++ \
-    && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends gcc g++ && rm -rf /var/lib/apt/lists/*
 
-# pip 업그레이드 및 빌드 도구 설치 (시스템 레벨)
-RUN pip install --upgrade pip && \
-    pip install setuptools wheel build
+# [핵심] CPU 전용 PyTorch 먼저 설치
+# 이 설정을 먼저 해야 나중에 설치되는 ultralytics가 무거운 GPU용 torch를 다시 받지 않습니다.
+RUN pip install --no-cache-dir torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
 
-# Python 패키지 설치 (사용자 디렉토리에 설치)
 COPY requirements.txt .
-RUN pip install --user --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
 
-# 실행 스테이지
+# 2단계: 실행용
 FROM python:3.12-slim
-
 WORKDIR /app
 
-# 런타임에 필요한 최소한의 시스템 패키지만 설치
+# 런타임 필수 패키지 (libgomp1은 YOLO CPU 연산에 필수입니다)
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    libgl1 \
-    libglib2.0-0 \
-    libsm6 \
-    libxext6 \
-    libxrender-dev \
-    libgomp1 \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+    libgl1 libglib2.0-0 libsm6 libxext6 libxrender-dev libgomp1 curl \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# 빌드 스테이지에서 Python 패키지 복사
-COPY --from=builder /root/.local /root/.local
+COPY --from=builder /install /usr/local
 
-# 애플리케이션 코드 복사
-COPY main.py .
+# 소스 복사
+COPY . .
 
-# PATH에 로컬 패키지 추가
-ENV PATH=/root/.local/bin:$PATH
-
-# 포트 노출
 EXPOSE 8000
 
 # 애플리케이션 실행
