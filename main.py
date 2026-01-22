@@ -99,6 +99,8 @@ async def detect_objects_multiple(
     
     - **files**: 업로드할 이미지 파일들
     """
+    print("CI/CD 확인용 테스트");
+
     try:
         all_crops = []
         results_list = []
