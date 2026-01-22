@@ -48,10 +48,10 @@ jobs:
             export DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
             
             # 최신 이미지 받아오기
-            docker-compose pull
+            docker compose pull
             
             # 서비스 재시작
-            docker-compose up -d
+            docker compose up -d
             
             # 불필요한 구형 이미지 삭제
             docker image prune -f
