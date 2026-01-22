@@ -44,9 +44,6 @@ jobs:
           script: |
             cd /opt/geniegoods
             
-            # Docker Hub 아이디를 환경 변수로 선언 (docker-compose.yml에서 사용)
-            export DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
-            
             # 최신 이미지 받아오기
             docker compose pull
             
