@@ -20,7 +20,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
-          context: ./geniegoods-yolo
+          context: .
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/geniegoods-yolo:latest
 
