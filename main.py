@@ -43,6 +43,7 @@ async def lifespan(app: FastAPI):
     # Startup
     load_model()
     print("YOLO 모델 로드 완료")
+    print("CI/CD 테스트 확인")
     yield
     # Shutdown (필요시 정리 작업)
 
